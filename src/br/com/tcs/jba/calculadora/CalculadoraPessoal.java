@@ -1,5 +1,7 @@
 package br.com.tcs.jba.calculadora;
 
+import javax.xml.bind.ValidationException;
+
 public class CalculadoraPessoal extends CalculadoraPessoalAbstract{
 	private double imc;
 	private String statusIMC;
@@ -35,19 +37,42 @@ public class CalculadoraPessoal extends CalculadoraPessoalAbstract{
 	}
 
 	public String calcularImc(String algura, String peso) throws Exception {
-		double alturaDouble = 0;
-		double pesoDouble = 0;
-		try {
-			alturaDouble = Double.parseDouble(algura.replaceAll(",", "."));
-		} catch (Exception e) {
-			throw new Exception("Altura inválida, informe um número válido.");
-		}
-		
+		double alturaDouble = convertAlturaToDouble(algura);
+		double pesoDouble = convertPesoToDouble(peso);
+		validaPesoHumano(pesoDouble);
+		validaAlturaHumana(alturaDouble);
+		return calcularImc(alturaDouble, pesoDouble);
+	}
+
+	private double convertPesoToDouble(String peso) throws Exception {
+		double pesoDouble;
 		try {
 			pesoDouble = Double.parseDouble(peso.replaceAll(",", "."));
 		} catch (Exception e) {
 			throw new Exception("Peso inválido, informe um número válido.");
 		}
-		return calcularImc(alturaDouble, pesoDouble);
+		return pesoDouble;
+	}
+
+	private double convertAlturaToDouble(String algura) throws Exception {
+		double alturaDouble;
+		try {
+			alturaDouble = Double.parseDouble(algura.replaceAll(",", "."));
+		} catch (Exception e) {
+			throw new Exception("Altura inválida, informe um número válido.");
+		}
+		return alturaDouble;
+	}
+
+	private void validaAlturaHumana(double altura) throws Exception{
+		if(altura>=3) {
+			throw new ValidationException("Altura informada deve ser inferior à 3 M");
+		}
+	}
+
+	private void validaPesoHumano(double pesoDouble) throws Exception{
+		if(pesoDouble>=500) {
+			throw new ValidationException("Peso informado deve ser inferior à 500 kg");
+		}
 	}
 }
